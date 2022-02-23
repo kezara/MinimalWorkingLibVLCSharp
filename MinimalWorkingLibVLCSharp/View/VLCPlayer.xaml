@@ -32,6 +32,7 @@
         </Style>
     </UserControl.Resources>
     <Grid>
+        <!--VideoView-->
         <uc:VideoView x:Name="vvPlayer" IsHitTestVisible="True">
             <Grid Background="#01000000" x:Name="myGrid"
                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -44,6 +45,7 @@
                         <ColumnDefinition/>
                         <ColumnDefinition Width="90"/>
                     </Grid.ColumnDefinitions>
+                    <!--Display title-->
                     <DockPanel HorizontalAlignment="Stretch"
                                VerticalAlignment="Stretch"
                                Grid.Row="1" Grid.Column="0"
@@ -62,6 +64,7 @@
                                 Grid.Row="0"
                                 Grid.Column="1"
                                 x:Name="buttonsPanel">
+                        <!--Minimize button-->
                         <Button Content="_" FontWeight="DemiBold"
                         Height="30" Width="30" 
                         VerticalAlignment="Top" HorizontalAlignment="Right"
@@ -72,6 +75,7 @@
                         Click="MinimizeButton_Click"
                                 Name="Minimize_btn"
                         />
+                        <!--Restore button-->
                         <Button Content="▯" FontWeight="DemiBold"
                         Height="30" Width="30" 
                         VerticalAlignment="Top" HorizontalAlignment="Right"
@@ -81,6 +85,7 @@
                         ToolTip="Restore"
                                 Click="RestoreButton_Click"
                         />
+                        <!--Close button-->
                         <Button Content="X" FontWeight="DemiBold"
                         Height="30" Width="30" 
                         VerticalAlignment="Top" HorizontalAlignment="Right"
@@ -91,6 +96,7 @@
                         Click="CloseButton_Click"
                         />
                     </StackPanel>
+                    <!--Move to grid button-->
                     <Button Grid.Row="1" Grid.Column="1" Content="Move to grid" Height="30" VerticalAlignment="Top" HorizontalAlignment="Right" Width="90"
                        Click="MoveToGrid_Click"
                             Name="MoveToGrid_btn"/>

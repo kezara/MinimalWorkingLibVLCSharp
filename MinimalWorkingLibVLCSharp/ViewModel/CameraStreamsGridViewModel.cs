@@ -1,14 +1,9 @@
 ﻿using MinimalWorkingLibVLCSharp.Events;
 using MinimalWorkingLibVLCSharp.Model;
-using MinimalWorkingLibVLCSharp.ViewModel;
 using Stylet;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MinimalWorkingLibVLCSharp.ViewModel
 {
@@ -26,15 +21,13 @@ namespace MinimalWorkingLibVLCSharp.ViewModel
             }
         }
 
-        private WindowViewManager _windowViewManager;
-        StreamGridModel _sgm;
-        Camera _camera;
-
-
-        public CameraStreamsGridViewModel(WindowViewManager windowViewManager, IEventAggregator events)
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="events"></param>
+        public CameraStreamsGridViewModel(IEventAggregator events)
         {
             CameraStreams = new BindableCollection<StreamGridModel>();
-            _windowViewManager = windowViewManager;
             _events = events;
             _events.Subscribe(this);
             DisplayName = "Video wall";
@@ -47,17 +40,20 @@ namespace MinimalWorkingLibVLCSharp.ViewModel
         /// <param name="camera">camera</param>
         public void AddToCollection(CameraStreamGridViewModel streams, Camera camera)
         {
-            _sgm = new StreamGridModel();
+            var _sgm = new StreamGridModel();
             _sgm.CameraStreamGridViewModel = streams;
             _sgm.CameraStreamGridViewModel.Cam = camera;
             CameraStreams.Add(_sgm);
         }
 
+        /// <summary>
+        /// Should dispose all open streams and players
+        /// </summary>
         public void WindowClosed()
         {
             foreach (var stream in CameraStreams)
             {
-                stream.CameraStreamGridViewModel.VlcPlayer.vvPlayer.Dispose();
+                stream.CameraStreamGridViewModel.Dispose();
             }
             CameraStreams = new BindableCollection<StreamGridModel>();
             _events.Publish(new WindowClosed { ClosedWindow = this });

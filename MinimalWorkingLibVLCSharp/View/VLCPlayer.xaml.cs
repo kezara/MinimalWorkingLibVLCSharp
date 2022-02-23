@@ -5,14 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media.Animation;
 
 namespace MinimalWorkingLibVLCSharp.View
 {
     /// <summary>
     /// Interaction logic for VLCPlayer.xaml
     /// </summary>
-    public partial class VLCPlayer : UserControl//, IDisposable
+    public partial class VLCPlayer : UserControl
     {
         public event EventHandler<PlayerEventArgs> ClosePlayer;
         public event EventHandler<PlayerEventArgs> RestorePlayer;
@@ -64,28 +63,15 @@ namespace MinimalWorkingLibVLCSharp.View
             set => SetValue(CameraProperty, value);
         }
 
-        private DoubleAnimation _animation;
-        private Storyboard sb;
-
         public VLCPlayer(WindowViewManager windowViewManager)
         {
             InitializeComponent();
             _windowViewManager = windowViewManager;
         }
 
-        private DoubleAnimation FadeOutAnimation()
-        {
-            var animation = new DoubleAnimation();
-            animation.From = 1;
-            animation.To = 0;
-            animation.Duration = new Duration(TimeSpan.FromMilliseconds(2000));
-            return animation;
-        }
-
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             ClosePlayer?.Invoke(this, new PlayerEventArgs(true));
-            //Dispose();
         }
 
         private void RestoreButton_Click(object sender, RoutedEventArgs e)
@@ -112,15 +98,6 @@ namespace MinimalWorkingLibVLCSharp.View
         {
             SendToGrid?.Invoke(this, new PlayerEventArgs(true));
         }
-
-        //public void Dispose()
-        //{
-        //    vvPlayer.MediaPlayer.Stop();
-        //    vvPlayer.MediaPlayer.Dispose();
-        //    DataContext = null;
-        //    vvPlayer.Dispose();
-        //    GC.Collect();
-        //}
 
         ~VLCPlayer()
         {

@@ -3,10 +3,6 @@ using MinimalWorkingLibVLCSharp.Model;
 using MinimalWorkingLibVLCSharp.View;
 using Stylet;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 
@@ -14,14 +10,20 @@ namespace MinimalWorkingLibVLCSharp.ViewModel
 {
     public abstract class CameraStreamViewModelAbstract : Screen, IDisposable
     {
-        protected IEventAggregator _events;
-        protected WindowViewManager _windowViewManager;
-        private string _stramPath;
+        private string _streamPath;
         WindowState _windowState;
         WindowStyle _windowStyle;
         private Camera _camera;
         private bool _windowTopMost;
+        private VLCPlayer _vlcPlayer;
+        bool _buttonVisibility;
+        int _buttonOpacity;
+        private ResizeMode _resizeMode;
 
+        protected bool disposedValue;
+        protected IEventAggregator _events;
+        protected WindowViewManager _windowViewManager;
+        
         public bool WindowTopMost
         {
             get { return _windowTopMost; }
@@ -30,19 +32,6 @@ namespace MinimalWorkingLibVLCSharp.ViewModel
                 SetAndNotify(ref _windowTopMost, value);
             }
         }
-
-
-        public Camera Camera
-        {
-            get { return _camera; }
-            set
-            {
-                SetAndNotify(ref _camera, value);
-                //Player.GMarker = _camera;
-            }
-        }
-
-
         public WindowState WindowState
         {
             get => _windowState;
@@ -70,14 +59,19 @@ namespace MinimalWorkingLibVLCSharp.ViewModel
         public int WindowHeight { get; set; }
         public int WindowWidth { get; set; }
 
+        public Camera Camera
+        {
+            get { return _camera; }
+            set
+            {
+                SetAndNotify(ref _camera, value);
+            }
+        }
         public string StreamPath
         {
-            get { return _stramPath; }
-            set { _stramPath = value; }
+            get { return _streamPath; }
+            set { _streamPath = value; }
         }
-
-        private VLCPlayer _vlcPlayer;
-
         public VLCPlayer VlcPlayer
         {
             get { return _vlcPlayer; }
@@ -86,72 +80,7 @@ namespace MinimalWorkingLibVLCSharp.ViewModel
                 SetAndNotify(ref _vlcPlayer, value);
             }
         }
-
-
         public double SecondaryScreenStart { get; set; }
-
-        public CameraStreamViewModelAbstract(IEventAggregator events, WindowViewManager windowViewManager)
-        {
-            //_events = events;
-            //_events.Subscribe(this);
-            //_cameraViewOverlayViewModel = cameraViewOverlayViewModel;
-            _windowViewManager = windowViewManager;
-            //can be removed use instead WindowViewManager
-            //_cameraStreamRepository = cameraStreamRepository;
-
-
-            WindowState = WindowState.Maximized;
-            WindowStyle = WindowStyle.None;
-            ResizeMode = ResizeMode.NoResize;
-            //SecondaryScreenStart = Helpers.CalculateSecondaryDisplay();
-        }
-
-        protected override void OnViewLoaded()
-        {
-            base.OnViewLoaded();
-            VlcPlayer = _windowViewManager.Container.Get<VLCPlayer>();//new VLCPlayer();
-            VlcPlayer.ClosePlayer += ClosePlayer;
-            
-            VlcPlayer.SendToGrid += Player_SendToGrid;
-            DisplayName = Camera.Name;
-            //VlcPlayer.DisplayName = Camera.Name;
-            VlcPlayer.Camera = Camera;
-        }
-
-        protected void Player_SendToGrid(object sender, PlayerEventArgs e)
-        {
-            MoveToGrid();
-        }
-
-        protected virtual void ClosePlayer(object sender, PlayerEventArgs e)
-        {
-            //_events.Publish(new WindowClosed { ClosedWindow = this });
-            RequestClose();
-        }
-
-        public virtual void OnWindowStateChanged(object sender, EventArgs e)
-        {
-            var csw = sender as CameraStreamView;
-            if (csw.IsLoaded)
-            {
-                ResizeMode = ResizeMode.NoResize;
-                if (WindowState == WindowState.Maximized)
-                {
-                    WindowStyle = WindowStyle.None;
-                    WindowState = WindowState.Maximized;
-                    WindowTopMost = true;
-                    WindowTopMost = false;
-                    VlcPlayer.ShowControls();
-                    HideCameraOverlayButtons(false);
-                }
-            }
-        }
-
-
-        bool _buttonVisibility;
-        int _buttonOpacity;
-        private ResizeMode _resizeMode;
-        protected bool disposedValue;
 
         public int Height { get; set; }
         public int Width { get; set; }
@@ -174,6 +103,54 @@ namespace MinimalWorkingLibVLCSharp.ViewModel
             }
         }
 
+        //ctor
+        protected CameraStreamViewModelAbstract(IEventAggregator events, WindowViewManager windowViewManager)
+        {
+            _windowViewManager = windowViewManager;
+            WindowState = WindowState.Maximized;
+            WindowStyle = WindowStyle.None;
+            ResizeMode = ResizeMode.NoResize;
+        }
+
+        //after view is loaded set player
+        protected override void OnViewLoaded()
+        {
+            base.OnViewLoaded();
+            VlcPlayer = _windowViewManager.Container.Get<VLCPlayer>();
+            VlcPlayer.ClosePlayer += ClosePlayer;
+            VlcPlayer.SendToGrid += Player_SendToGrid;
+            DisplayName = Camera.Name;
+            VlcPlayer.Camera = Camera;
+        }
+
+        protected void Player_SendToGrid(object sender, PlayerEventArgs e)
+        {
+            MoveToGrid();
+        }
+
+        protected virtual void ClosePlayer(object sender, PlayerEventArgs e)
+        {
+            RequestClose();
+        }
+
+        public virtual void OnWindowStateChanged(object sender, EventArgs e)
+        {
+            var csw = sender as CameraStreamView;
+            if (csw.IsLoaded)
+            {
+                ResizeMode = ResizeMode.NoResize;
+                if (WindowState == WindowState.Maximized)
+                {
+                    WindowStyle = WindowStyle.None;
+                    WindowState = WindowState.Maximized;
+                    WindowTopMost = true;
+                    WindowTopMost = false;
+                    VlcPlayer.ShowControls();
+                    HideCameraOverlayButtons(false);
+                }
+            }
+        }
+
         public void ChangeButtonBackground()
         {
             ButtonBackground = Brushes.Red;
@@ -192,8 +169,6 @@ namespace MinimalWorkingLibVLCSharp.ViewModel
             var csvm = _windowViewManager.Container.Get<CameraStreamGridViewModel>();
 
             window.AddToCollection(csvm, VlcPlayer.Camera);
-            //csvm.Camera = cam;
-            //VlcPlayer = null;
             ClosePlayer(this, new PlayerEventArgs(true));
         }
 
@@ -214,27 +189,14 @@ namespace MinimalWorkingLibVLCSharp.ViewModel
             Dispose();
         }
 
-        
-
         public void Dispose()
         {
-           
-            //_events.Unsubscribe(this);
             VlcPlayer.ClosePlayer -= ClosePlayer;
-            //VlcPlayer.RestorePlayer -= RestorePlayer;
-            //VlcPlayer.MinimizePlayer -= MinimizePlayer;
-            //VlcPlayer.Camera = null;
-            //VlcPlayer.DataContext = null;
             VlcPlayer.vvPlayer.MediaPlayer.Stop();
             VlcPlayer.vvPlayer.MediaPlayer.Media.Dispose();
 
             VlcPlayer.vvPlayer.MediaPlayer.Dispose();
             VlcPlayer.vvPlayer.Dispose();
-        }
-
-        ~CameraStreamViewModelAbstract()
-        {
-
         }
     }
 }

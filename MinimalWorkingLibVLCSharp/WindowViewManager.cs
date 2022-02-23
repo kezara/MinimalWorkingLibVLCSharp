@@ -1,8 +1,6 @@
 ﻿using MinimalWorkingLibVLCSharp.Events;
 using MinimalWorkingLibVLCSharp.Model;
-using MinimalWorkingLibVLCSharp.ViewModel;
 using Stylet;
-using System.Linq;
 using System.Windows;
 
 namespace MinimalWorkingLibVLCSharp
@@ -45,27 +43,6 @@ namespace MinimalWorkingLibVLCSharp
             }
         }
 
-        /// <summary>
-        /// ensures that only one video of selected camera is displayed
-        /// in grid view or single window view
-        /// </summary>
-        /// <param name="camera">CameraMarker</param>
-        public void EnsureVisible(Camera camera)
-        {
-            Screen vm;
-            if (_openedWindows.ContainsKey(camera))
-            {
-                vm = _openedWindows[camera];
-            }
-            else
-            {
-                vm = _openedWindows[_cameraStreamGridMarker];
-            }
-            var window = (Window)vm.View;
-            BringWindowToFront(window);
-            //_windowManager.ShowWindow(vm);
-        }
-
         public void EnsureVisible(Screen viewModel, Camera camera)
         {
             if (_openedWindows.ContainsKey(camera))
@@ -92,33 +69,7 @@ namespace MinimalWorkingLibVLCSharp
                 window.Activate();
             }
         }
-
-        public bool IsCameraOpened(Camera camera)
-        {
-            if (_openedWindows.ContainsKey(camera))
-            {
-                return true;
-            }
-            else if (_openedWindows.ContainsKey(_cameraStreamGridMarker))
-            {
-                
-                var grid = (CameraStreamsGridViewModel)_openedWindows[_cameraStreamGridMarker];
-                var cam = grid.CameraStreams.Where(c => c.CameraStreamGridViewModel.Cam.Id == camera.Id).FirstOrDefault();
-                if (cam != null)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
         
-
-        public bool? ShowDialog(object viewModel)
-        {
-            return _windowManager.ShowDialog(viewModel);
-        }
-
         public void Handle(WindowClosed message)
         {
             var key = _openedWindows[message.ClosedWindow];

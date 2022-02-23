@@ -1,47 +1,37 @@
 ﻿using MinimalWorkingLibVLCSharp.Model;
 using Stylet;
-using StyletIoC;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MinimalWorkingLibVLCSharp.ViewModel
 {
     public class ShellViewModel : Conductor<IScreen>
     {
-        readonly IContainer _container;
-        private IWindowManager _windowManager;
-        bool? _isLoggedIn = false;
         Camera _camera;
+        WindowViewManager _windowViewManager;
 
-        public ShellViewModel(IContainer container, IWindowManager windowManager, IEventAggregator events)
+        public ShellViewModel(WindowViewManager windowViewManager)
         {
             this.DisplayName = "Shell View";
-            _container = container;
-            _windowManager = windowManager;
+            _windowViewManager = windowViewManager;
             _camera = new Camera
             {
                 CameraAccess = new CameraAccess
                 {
-                    IpAddress = "192.168.25.32",
+                    IpAddress = "camera ip address",
                     Port = 80,
-                    Password = "admin12345",
-                    Username = "admin"
+                    Password = "password",
+                    Username = "username"
                 },
                 Name = "Camera 1",
-                ProfileLive = "rtsp://192.168.25.33:554/Streaming/Channels/1?transportmode=unicast&profile=Profile_1",
-                ProfileProcessing = "rtsp://192.168.25.33:554/Streaming/Channels/2?transportmode=unicast&profile=Profile_2"
+                ProfileLive = "rtsp:",
+                ProfileProcessing = "rtsp:"
             };
-           // events.Subscribe(this);
         }
 
         public void OpenStream()
         {
-            var window = _container.Get<CameraStreamViewModel>();
+            var window = _windowViewManager.Container.Get<CameraStreamViewModel>();
             window.Camera = _camera;
-            _windowManager.ShowWindow(window);
+            _windowViewManager.EnsureVisible(window, _camera);
         }
     }
 }

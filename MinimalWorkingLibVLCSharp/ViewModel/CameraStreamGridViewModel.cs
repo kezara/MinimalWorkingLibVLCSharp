@@ -31,15 +31,9 @@ namespace MinimalWorkingLibVLCSharp.ViewModel
 
         protected void RestorePlayer(object sender, PlayerEventArgs e)
         {
-            //var repo = _windowViewManager.Container.Get<MapLocationRepository>();
-            //var cameraMarker = repo.GetCameraMarker(VlcPlayer.Camera);
             ClosePlayer(sender, e);
-            //if (cameraMarker != null)
-            //{
-                var window = _windowViewManager.Container.Get<CameraStreamViewModel>();
-            _windowViewManager.WindowManager.ShowWindow(window);
-                //_windowViewManager.EnsureVisible(window, cameraMarker);
-            //}
+            var window = _windowViewManager.Container.Get<CameraStreamViewModel>();
+            _windowViewManager.EnsureVisible(window, window.Camera);
         }
     }
 }

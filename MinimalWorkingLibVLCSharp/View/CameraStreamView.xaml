@@ -17,7 +17,7 @@
         Height="500" Width="500"
         StateChanged="{s:Action OnWindowStateChanged}"
         Topmost="{Binding WindowTopMost, Mode=TwoWay}"
-        Closed="{s:Action WindowClosed}"
+        Closing="{s:Action WindowClosed}"
         
         >
 
